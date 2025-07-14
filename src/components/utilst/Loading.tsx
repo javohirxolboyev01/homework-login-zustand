@@ -1,14 +1,14 @@
 import React from "react";
 import { Spin } from "antd";
+
 const Loading = () => {
   return (
-    <div>
-      <div className="w-full h-screen grid place-items-center ">
-        <div className="flex flex-col items-center">
-          {/* <img src={Logo} width={80} alt="Loading..." /> */}
-          <Spin style={{color:"gray"}} size="large" />
-          <p className="text-gray-700  text-sm mt-2 ml-3">Yuklanmoqda...</p>
-        </div>
+    <div className="w-full h-screen flex items-center justify-center bg-black">
+      <div className="container mx-auto px-4 flex flex-col items-center">
+        <Spin size="large" style={{ color: "white" }} />
+        <p className="text-white text-base mt-4 tracking-widest font-semibold uppercase text-center">
+          Loading...
+        </p>
       </div>
     </div>
   );

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { MenuOutlined, CloseOutlined, LogoutOutlined } from "@ant-design/icons";
-import { useAuth } from "../../zustand/store";
+import { useStore } from "../../zustand/store";
 
 const Navbar: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const { isAuthenticated, token, clearAuth } = useAuth();
+  const { token, clearAuth } = useStore();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -19,49 +19,47 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="bg-[#1e2329] border-b border-[#2d323c] shadow-md relative z-50">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center relative">
-        <h1 className="text-white text-xl font-bold">Logo</h1>
-
-        <nav className="hidden md:flex gap-8 absolute left-1/2 -translate-x-1/2">
+    <header className="bg-black border-b border-gray-800 shadow-md relative z-50">
+      <div className="container max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 className="text-white text-2xl font-extrabold tracking-widest uppercase">
+          Logo
+        </h1>
+        <nav className="hidden md:flex gap-10">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
                 isActive
-                  ? "text-[#2ecc71] font-semibold"
-                  : "text-gray-300 hover:text-white transition"
+                  ? "text-red-600 font-bold underline"
+                  : "text-white hover:text-red-600 transition font-semibold"
               }
             >
               {item.name}
             </NavLink>
           ))}
         </nav>
-
         <div className="hidden md:flex items-center gap-4">
-          {isAuthenticated() && (
+          {token && (
             <button
               onClick={handleLogout}
-              className="text-gray-300 hover:text-white transition flex items-center gap-2"
+              className="text-white hover:text-red-600 transition flex items-center gap-2 font-semibold"
             >
               <LogoutOutlined />
               Logout
             </button>
           )}
         </div>
-
         <button
-          className="md:hidden text-white text-xl"
+          className="md:hidden text-white text-2xl"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
           {open ? <CloseOutlined /> : <MenuOutlined />}
         </button>
       </div>
-
       {open && (
-        <div className="md:hidden bg-[#1e2329] px-6 py-4 border-t border-[#2d323c]">
+        <div className="md:hidden bg-black px-6 py-4 border-t border-gray-800">
           <nav className="flex flex-col gap-4">
             {navItems.map((item) => (
               <NavLink
@@ -69,21 +67,21 @@ const Navbar: React.FC = () => {
                 to={item.path}
                 className={({ isActive }) =>
                   isActive
-                    ? "text-[#2ecc71] font-semibold"
-                    : "text-gray-300 hover:text-white transition"
+                    ? "text-red-600 font-bold underline"
+                    : "text-white hover:text-red-600 transition font-semibold"
                 }
                 onClick={() => setOpen(false)}
               >
                 {item.name}
               </NavLink>
             ))}
-            {isAuthenticated() && (
+            {token && (
               <button
                 onClick={() => {
                   handleLogout();
                   setOpen(false);
                 }}
-                className="text-gray-300 hover:text-white transition flex items-center gap-2"
+                className="text-white hover:text-red-600 transition flex items-center gap-2 font-semibold"
               >
                 <LogoutOutlined />
                 Logout

@@ -1,106 +1,92 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../components/zustand/store";
-import { mockAuthService } from "../../api/mockAuth";
+import { useAuth } from "../../api/hooks/useAuth";
+import { useStore } from "../../components/zustand/store";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-  });
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const { setTokens } = useAuth();
+  const { getAuth } = useAuth();
+  const { setToken, setRefreshToken } = useStore();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const from = (location.state as any)?.from?.pathname || "/";
-
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-
+    setError(null);
     try {
-      const res = await mockAuthService.login(form.username, form.email);
-
-      const { accessToken, refreshToken } = res.data;
-
-      setTokens(accessToken, refreshToken);
-      alert("Login muvaffaqiyatli !");
-      navigate(from, { replace: true });
-    } catch (err: any) {
-      alert("Login xato: " + (err?.message || "Xatolik yuz berdi"));
+      const res = await getAuth({ username, password });
+      console.log("API dan  res:", res);
+      setToken(res.accessToken);
+      setRefreshToken(res.refreshToken);
+      navigate("/");
+    } catch (e: any) {
+      setError(
+        "Kirish muvaffaqiyatsiz yakunlandi. Iltimos, ma'lumotlaringizni tekshiring."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="w-full max-w-sm border border-gray-200 rounded-lg shadow-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Sign In</h1>
-          <p className="text-gray-500 mt-2 text-sm">
-            Please enter your details
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 px-4">
+      <div className="container max-w-md mx-auto px-4">
+        <div className="bg-white p-10 rounded-2xl shadow-2xl border border-gray-200">
+          <h2 className="text-3xl font-extrabold text-center text-black mb-8 tracking-tight uppercase">
+            Sign in to your account
+          </h2>
+          {error && (
+            <div className="text-red-500 text-center mb-4">{error}</div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-7">
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-xs font-semibold text-gray-700 uppercase tracking-widest"
+              >
+                Username
+              </label>
+              <input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                id="username"
+                type="text"
+                required
+                className="mt-2 block w-full px-5 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-xs font-semibold text-gray-700 uppercase tracking-widest"
+              >
+                Password
+              </label>
+              <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                id="password"
+                type="password"
+                required
+                className="mt-2 block w-full px-5 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 px-4 bg-black hover:bg-gray-900 text-white font-bold rounded-lg transition uppercase tracking-widest disabled:bg-gray-400"
+            >
+              {loading ? "Loading..." : "Sign In"}
+            </button>
+          </form>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-sm text-gray-700 font-medium"
-            >
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              id="username"
-              placeholder="your username"
-              onChange={onChange}
-              value={form.username}
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md"
-              required
-              minLength={3}
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm text-gray-700 font-medium"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              placeholder="you@example.com"
-              onChange={onChange}
-              value={form.email}
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {loading ? "Loading..." : "Log In"}
-          </button>
-        </form>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default React.memo(Login);

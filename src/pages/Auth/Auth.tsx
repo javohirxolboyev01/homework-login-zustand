@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../../components/zustand/store";
+import { useStore } from "../../components/zustand/store";
 
 const Auth = () => {
-  const isAuthenticated = useAuth((s) => s.isAuthenticated());
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  const { token } = useStore();
+  return token ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default Auth;

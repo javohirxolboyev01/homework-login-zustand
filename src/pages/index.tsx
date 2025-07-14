@@ -1,8 +1,6 @@
 import React, { lazy } from "react";
 import { useRoutes } from "react-router-dom";
-import ProtectedRoute from "../components/ProtectedRoute";
-import StatisticsProtectedRoute from "../components/StatisticsProtectedRoute";
-
+const Auth = lazy(() => import("./Auth/Auth"));
 const Layout = lazy(() => import("../components/layout/Layout"));
 const Home = lazy(() => import("./Home/Home"));
 const Statistic = lazy(() => import("./Statistica/Statistic"));
@@ -12,34 +10,19 @@ const MainRoute = () => {
   return useRoutes([
     {
       path: "/",
-      element: (
-        <ProtectedRoute>
-          <Layout />
-        </ProtectedRoute>
-      ),
+      element: <Auth />,
       children: [
         {
-          path: "/",
-          element: <Home />,
-        },
-        {
-          path: "statistica",
-          element: (
-            <StatisticsProtectedRoute>
-              <Statistic />
-            </StatisticsProtectedRoute>
-          ),
+          path: "",
+          element: <Layout />,
+          children: [
+            { path: "", element: <Home /> },
+            { path: "statistica", element: <Statistic /> },
+          ],
         },
       ],
     },
-    {
-      path: "login",
-      element: (
-        <ProtectedRoute requireAuth={false}>
-          <Login />
-        </ProtectedRoute>
-      ),
-    },
+    { path: "/login", element: <Login /> },
   ]);
 };
 
